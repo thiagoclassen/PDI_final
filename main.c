@@ -12,7 +12,9 @@
 
 /*============================================================================*/
 
-//#define INPUT_IMAGE "Imagens/placa_4.bmp"
+#define ALTURA_MIN 5
+#define LARGURA_MIN 5
+#define N_PIXELS_MIN 30
 
 /*============================================================================*/
 
@@ -22,11 +24,13 @@ void recurssChamfer(Imagem *canny, Imagem *chamfer, float value, int y, int x);
 
 void redDetector(Imagem *img, Imagem *img_out);
 
+void redMapping(Imagem *in, Imagem *out);
+
 /*============================================================================*/
 
 int main()
 {
-	int i, j; //, p;
+	//int i, j; //, p;
 	//float r, g, b, h, s, l;
 
 	char *files[13] = {"./img/placa01.bmp", "./img/placa02.bmp", "./img/placa03.bmp", "./img/placa04.bmp",
@@ -34,9 +38,9 @@ int main()
 					   "./img/placa09.bmp", "./img/placa10.bmp", "./img/placa11.bmp"
 					   , "./img/placa12.bmp", "./img/placa13.bmp"};
 
-	char fileName[20];
+	char fileName[25];
 
-	for (int idx = 12; idx < 13; idx++)
+	for (int idx = 0; idx < 13; idx++)
 	{
 
 		Imagem *img = abreImagem(files[idx], 3);
@@ -50,20 +54,26 @@ int main()
 		Imagem *chamfer = criaImagem(img->largura, img->altura, 1);
 
 		Imagem *red = criaImagem(img->largura, img->altura, 3);
+		
+		Imagem *redMap = criaImagem(img->largura, img->altura, 3);
 
-		/*redDetector(img, red);
+		redDetector(img, red);
 
-		sprintf(fileName, "./resultados/%d-red.bmp", idx);
-		salvaImagem(red, fileName);
-
-		detectorCanny(red, 3, 0.01, 0.4, 1, canny);*/
+		sprintf(fileName, "./resultados/%d-red.bmp", idx+1);
+		salvaImagem(red, fileName);		
 
 		detectorCanny(img, 3, 0.01, 0.4, 1, canny);
 
-		sprintf(fileName, "./resultados/%d-canny.bmp", idx);
-		salvaImagem(canny, "cannyTeste.bmp");
+		sprintf(fileName, "./resultados/%d-canny.bmp", idx+1);
+		salvaImagem(canny, fileName);
 
-		for (i = 0; i < chamfer->altura; i++)
+		redMapping(img, redMap);
+		sprintf(fileName, "./resultados/%d-redMap.bmp", idx+1);
+		ComponenteConexo *componentes;
+		rotulaFloodFill(redMap, &componentes, LARGURA_MIN, ALTURA_MIN, N_PIXELS_MIN);
+		salvaImagem(redMap, fileName);		
+
+		/*for (i = 0; i < chamfer->altura; i++)
 		{
 			for (j = 0; j < chamfer->largura; j++)
 			{
@@ -74,12 +84,13 @@ int main()
 		Imagem *tst = abreImagem("saida.bmp", 3);
 		chamferFunc(canny, tst);
 
-		salvaImagem(chamfer, "chamfer_teste.bmp");
+		salvaImagem(chamfer, "chamfer_teste.bmp");*/
 
 		destroiImagem(canny);
 		destroiImagem(chamfer);
 		destroiImagem(img);
 		destroiImagem(red);
+		destroiImagem(redMap);
 	}
 	return (0);
 }
@@ -194,4 +205,34 @@ void redDetector(Imagem *img, Imagem *img_out){
 				}
 			}
 		}
+}
+
+void redMapping(Imagem *in, Imagem *out)
+{
+    if (in->largura != out->largura || in->altura != out->altura || in->n_canais != out->n_canais)
+    {
+        printf("ERRO: binariza: as imagens precisam ter o mesmo tamanho e numero de canais.\n");
+        exit(1);
+    }
+
+    int j, k;
+	float r, g, b;
+    for (j = 0; j < in->altura; j++){
+        for (k = 0; k < in->largura; k++){
+
+			r = in->dados[0][j][k];
+			g = in->dados[1][j][k];
+			b = in->dados[2][j][k];
+
+            if ((r - g > 0.1 && r - b > 0.1f)) {
+                out->dados[0][j][k] = 1.0f;
+				out->dados[1][j][k] = 1.0f;
+				out->dados[2][j][k] = 1.0f;
+			} else {
+                out->dados[0][j][k] = 0.0f;
+				out->dados[1][j][k] = 0.0f;
+				out->dados[2][j][k] = 0.0f;
+			}
+		}
+	}
 }

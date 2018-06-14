@@ -1,9 +1,9 @@
 /*============================================================================*/
-/* SEGMENTAÇÃO                                                                */
+/* SEGMENTAï¿½ï¿½O                                                                */
 /*----------------------------------------------------------------------------*/
 /* Autor: Bogdan T. Nassu - nassu@dainf.ct.utfpr.edu.br                       */
 /*============================================================================*/
-/** Tipos e funções para segmentação. */
+/** Tipos e funï¿½ï¿½es para segmentaï¿½ï¿½o. */
 /*============================================================================*/
 
 #include <stdio.h>
@@ -13,17 +13,17 @@
 #include "segmenta.h"
 
 /*============================================================================*/
-/* CLASSIFICAÇÃO DE PIXELS                                                    */
+/* CLASSIFICAï¿½ï¿½O DE PIXELS                                                    */
 /*============================================================================*/
-/** Binarização simples por limiarização.
+/** Binarizaï¿½ï¿½o simples por limiarizaï¿½ï¿½o.
  *
- * Parâmetros: Imagem* in: imagem de entrada. Se tiver mais que 1 canal,
+ * Parï¿½metros: Imagem* in: imagem de entrada. Se tiver mais que 1 canal,
  *               binariza cada canal independentemente.
- *             Imagem* out: imagem de saída. Deve ter o mesmo tamanho da
+ *             Imagem* out: imagem de saï¿½da. Deve ter o mesmo tamanho da
  *               imagem de entrada.
  *             float threshold: limiar.
  *
- * Valor de retorno: nenhum (usa a imagem de saída). */
+ * Valor de retorno: nenhum (usa a imagem de saï¿½da). */
 
 void binariza (Imagem* in, Imagem* out, float threshold)
 {
@@ -41,20 +41,20 @@ void binariza (Imagem* in, Imagem* out, float threshold)
 }
 
 /*----------------------------------------------------------------------------*/
-/** Limiarização adaptativa, baseada na média em uma vizinança quadrada de
+/** Limiarizaï¿½ï¿½o adaptativa, baseada na mï¿½dia em uma vizinanï¿½a quadrada de
  * cada pixel.
  *
- * Parâmetros: Imagem* in: imagem de entrada. Se tiver mais que 1 canal,
+ * Parï¿½metros: Imagem* in: imagem de entrada. Se tiver mais que 1 canal,
  *               processa cada canal independentemente.
- *             Imagem* out: imagem de saída. Deve ter o mesmo tamanho da
+ *             Imagem* out: imagem de saï¿½da. Deve ter o mesmo tamanho da
  *               imagem de entrada.
- *             int largura: largura/altura da janela para a média.
+ *             int largura: largura/altura da janela para a mï¿½dia.
  *             float threshold: limiar.
  *             Imagem* buffer: uma imagem com o mesmo tamanho da imagem de
- *               entrada. Pode ser usada quando se quer evitar a alocação do
+ *               entrada. Pode ser usada quando se quer evitar a alocaï¿½ï¿½o do
  *               buffer interno. Use NULL se quiser usar o buffer interno.
  *
- * Valor de retorno: nenhum (a imagem de saída é usada). */
+ * Valor de retorno: nenhum (a imagem de saï¿½da ï¿½ usada). */
 
 void binarizaAdapt (Imagem* in, Imagem* out, int largura, float threshold, Imagem* buffer)
 {
@@ -73,10 +73,10 @@ void binarizaAdapt (Imagem* in, Imagem* out, int largura, float threshold, Image
 
     int channel, row, col;
 
-    // Primeiro calcula as médias.
+    // Primeiro calcula as mï¿½dias.
     blur (in, out, largura, largura, buffer);
 
-    // Agora compara cada pixel com a média local.
+    // Agora compara cada pixel com a mï¿½dia local.
     for (channel = 0; channel < in->n_canais; channel++)
         for (row = 0; row < in->altura; row++)
             for (col = 0; col < in->largura; col++)
@@ -84,10 +84,10 @@ void binarizaAdapt (Imagem* in, Imagem* out, int largura, float threshold, Image
 }
 
 /*----------------------------------------------------------------------------*/
-/** Algoritmo de Otsu para encontrar o limiar para binarização. O histograma é
+/** Algoritmo de Otsu para encontrar o limiar para binarizaï¿½ï¿½o. O histograma ï¿½
  * montado considerando 8bpp.
  *
- * Parâmetros: Imagem* img: imagem de entrada.
+ * Parï¿½metros: Imagem* img: imagem de entrada.
  *
  * Valor de retorno: o limiar escolhido. */
 
@@ -145,16 +145,16 @@ float thresholdOtsu (Imagem* img)
 /** Rotulagem usando flood fill. Marca os objetos da imagem com os valores
  * [0.1,0.2,etc].
  *
- * Parâmetros: Imagem* img: imagem de entrada E saída.
+ * Parï¿½metros: Imagem* img: imagem de entrada E saï¿½da.
  *             ComponenteConexo** componentes: um ponteiro para um vetor de
- *               saída. Supomos que o ponteiro inicialmente é inválido. Ele irá
- *               apontar para um vetor que será alocado dentro desta função.
+ *               saï¿½da. Supomos que o ponteiro inicialmente ï¿½ invï¿½lido. Ele irï¿½
+ *               apontar para um vetor que serï¿½ alocado dentro desta funï¿½ï¿½o.
  *               Lembre-se de desalocar o vetor criado!
  *             int largura_min: descarta componentes com largura menor que esta.
  *             int altura_min: descarta componentes com altura menor que esta.
  *             int n_pixels_min: descarta componentes com menos pixels que isso.
  *
- * Valor de retorno: o número de componentes conexos encontrados. */
+ * Valor de retorno: o nï¿½mero de componentes conexos encontrados. */
 
 int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min)
 {
@@ -170,7 +170,7 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
                 n++;
             }
 
-    // Aloca o vetor de saída. Inicialmente, vamos reservar espaço como se cada pixel fosse um componente.
+    // Aloca o vetor de saï¿½da. Inicialmente, vamos reservar espaï¿½o como se cada pixel fosse um componente.
     *componentes = malloc (sizeof (ComponenteConexo) * n);
 
     // Aloca a pilha (para flood fill com pilha).
@@ -183,7 +183,7 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
     {
         for (col = 0; col < img->largura; col++)
         {
-            // Achou um componente não rotulado.
+            // Achou um componente nï¿½o rotulado.
             if (img->dados [0][row][col] < 0)
             {
                 ComponenteConexo* c = &((*componentes) [n]);
@@ -194,7 +194,7 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
 				pilha [0] = criaCoordenada (col,row);
 				floodFill (img, pilha, c);
 
-                // Verifica se este componente não ficou pequeno demais.
+                // Verifica se este componente nï¿½o ficou pequeno demais.
                 if (c->n_pixels >= n_pixels_min &&
                     c->roi.d - c->roi.e + 1 >= largura_min &&
                     c->roi.b - c->roi.c + 1 >= altura_min)
@@ -208,7 +208,7 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
     // Descarta a pilha.
 	free (pilha);
 
-    // Reduz o número de componentes ao necessário.
+    // Reduz o nï¿½mero de componentes ao necessï¿½rio.
     *componentes = realloc (*componentes, sizeof (ComponenteConexo) * n);
     return (n);
 }
@@ -216,10 +216,10 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
 /*----------------------------------------------------------------------------*/
 /** Flood fill com pilha.
  *
- * Parâmetros: Imagem* img: imagem a se inundar.
- *             Coordenada* pilha: buffer de memória a se usar. Consideramos que
- *               a primeira posição contém o ponto inicial da inundação.
- *             int valor: valor usado na inundação.
+ * Parï¿½metros: Imagem* img: imagem a se inundar.
+ *             Coordenada* pilha: buffer de memï¿½ria a se usar. Consideramos que
+ *               a primeira posiï¿½ï¿½o contï¿½m o ponto inicial da inundaï¿½ï¿½o.
+ *             int valor: valor usado na inundaï¿½ï¿½o.
  *             ComponenteConexo* componente: dados sobre o blob inundado.
  *
  * Valor de retorno: nenhum. */
@@ -231,14 +231,14 @@ void floodFill (Imagem* img, Coordenada* pilha, ComponenteConexo* componente)
 	// Rotula a semente.
     img->dados [0][pilha [0].y][pilha [0].x] = componente->label;
 
-    // Enquanto a pilha não esvaziar...
+    // Enquanto a pilha nï¿½o esvaziar...
     while (n_pilha)
     {
         // Remove o topo da pilha.
         Coordenada c = pilha [--n_pilha];
         componente->n_pixels++;
 
-        // Atualiza a região de interesse.
+        // Atualiza a regiï¿½o de interesse.
         if (c.y < componente->roi.c)
             componente->roi.c = c.y;
         if (c.y > componente->roi.b)
@@ -248,7 +248,7 @@ void floodFill (Imagem* img, Coordenada* pilha, ComponenteConexo* componente)
         if (c.x > componente->roi.d)
             componente->roi.d = c.x;
 
-        // Coloca os vizinhos não marcados do pixel na pilha.
+        // Coloca os vizinhos nï¿½o marcados do pixel na pilha.
         if (c.x > 0 && img->dados [0][c.y][c.x-1] < 0)
         {
             img->dados [0][c.y][c.x-1] = componente->label;
@@ -274,21 +274,21 @@ void floodFill (Imagem* img, Coordenada* pilha, ComponenteConexo* componente)
 
 /*----------------------------------------------------------------------------*/
 /** Rotulagem em 2 passadas usando uma union find que representa uma lista de
- * equivalências. Marca os objetos da imagem com os valores [1,2,etc]. FIXME:
- * o código está quase monolítico...
+ * equivalï¿½ncias. Marca os objetos da imagem com os valores [1,2,etc]. FIXME:
+ * o cï¿½digo estï¿½ quase monolï¿½tico...
  *
- * Parâmetros: Imagem* img: imagem de entrada E saída.
+ * Parï¿½metros: Imagem* img: imagem de entrada E saï¿½da.
  *             ComponenteConexo** componentes: um ponteiro para um vetor de
- *               saída. Supomos que o ponteiro inicialmente é inválido. Ele irá
- *               apontar para um vetor que será alocado dentro desta função.
+ *               saï¿½da. Supomos que o ponteiro inicialmente ï¿½ invï¿½lido. Ele irï¿½
+ *               apontar para um vetor que serï¿½ alocado dentro desta funï¿½ï¿½o.
  *               Lembre-se de desalocar o vetor criado!
  *             int largura_min: descarta componentes com largura menor que esta.
  *             int altura_min: descarta componentes com altura menor que esta.
  *             int n_pixels_min: descarta componentes com menos pixels que isso.
  *
- * Valor de retorno: o número de componentes conexos encontrados. */
+ * Valor de retorno: o nï¿½mero de componentes conexos encontrados. */
 
-// Funções auxiliares para implementar o union-find.
+// Funï¿½ï¿½es auxiliares para implementar o union-find.
 int rotulaFind (int* equivalencias, int classe)
 {
     while (equivalencias [classe] != 0)
@@ -303,7 +303,7 @@ void rotulaUnion (int* equivalencias, int classe1, int classe2)
     int raiz2 = rotulaFind (equivalencias, classe2);
 
     if (raiz1 == raiz2)
-        return; // As duas classes já são equivalentes.
+        return; // As duas classes jï¿½ sï¿½o equivalentes.
 
     if (raiz1 < raiz2)
         equivalencias [raiz2] = raiz1;
@@ -317,28 +317,31 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
 
     // Marca os objetos com valores negativos.
     n = 0;
-    for (i = 0; i < img->altura; i++)
-        for (j = 0; j < img->largura; j++)
+    for (i = 0; i < img->altura; i++){
+        for (j = 0; j < img->largura; j++){
             if (img->dados [0][i][j] > 0)
             {
                 img->dados [0][i][j] = -1;
                 n++;
             }
+        }
+    }
 
-    // Aloca a lista de equivalências.
+    // Aloca a lista de equivalï¿½ncias.
     int* equivalencias = malloc (sizeof (int) * n);
     int n_classes = 1;
     equivalencias [0] = 0;
 
     // Rotula.
-    // Primeira passada: vai marcando e criando a lista de equivalências.
+    // Primeira passada: vai marcando e criando a lista de equivalï¿½ncias.
     for (i = 0; i < img->altura; i++)
     {
         for (j = 0; j < img->largura; j++)
         {
-            if (img->dados [0][i][j] < 0) // Pixel não marcado.
+            if (img->dados [0][i][j] < 0) // Pixel nï¿½o marcado.
             {
-                // Tem um vizinho já marcado à esquerda ou acima?
+                
+                // Tem um vizinho jï¿½ marcado ï¿½ esquerda ou acima?
                 float label_cima = (i > 0)? img->dados [0][i-1][j] : 0;
                 float label_esquerda = (j > 0)? img->dados [0][i][j-1]: 0;
 
@@ -358,7 +361,7 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
                 }
                 else if (label_cima > 0) // Marca o pixel com a label do pixel acima.
                     img->dados [0][i][j] = label_cima;
-                else if (label_esquerda > 0) // Marca o pixel com a label do pixel à esquerda.
+                else if (label_esquerda > 0) // Marca o pixel com a label do pixel ï¿½ esquerda.
                     img->dados [0][i][j] = label_esquerda;
             }
         }
@@ -370,8 +373,8 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
             if (img->dados [0][i][j] > 0)
                 img->dados [0][i][j] = rotulaFind (equivalencias, (int) img->dados [0][i][j]);
 
-    // Descobrimos o número de classes únicas. Associamos cada classe a uma
-    // posição na lista de componentes. Reutilizamos a lista de equivalências.
+    // Descobrimos o nï¿½mero de classes ï¿½nicas. Associamos cada classe a uma
+    // posiï¿½ï¿½o na lista de componentes. Reutilizamos a lista de equivalï¿½ncias.
     n = 0;
     for (i = 1; i < n_classes; i++)
         if (equivalencias [i] == 0)
@@ -380,7 +383,7 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
             n++;
         }
 
-    // Aloca o vetor de saída.
+    // Aloca o vetor de saï¿½da.
     *componentes = malloc (sizeof (ComponenteConexo) * n);
 
     // Inicializa os componentes.
@@ -414,6 +417,9 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
     // Elimina componentes pequenos demais.
     int n_mantidos = 0;
 
+    
+    printf("\n Encontrados: %d \n", n);
+
     for (i = 0; i < n; i++)
     {
         ComponenteConexo* c = &((*componentes) [i]);
@@ -421,7 +427,7 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
             c->roi.d - c->roi.e + 1 >= largura_min &&
             c->roi.b - c->roi.c + 1 >= altura_min)
         {
-            // Move o componente para a sua posição final.
+            // Move o componente para a sua posiï¿½ï¿½o final.
             if (i != n_mantidos)
                 (*componentes) [n_mantidos] = *c;
 
@@ -429,7 +435,10 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
         }
     }
 
-    // Reduz o número de componentes ao necessário.
+    printf("\n Mantidos: %d \n", n_mantidos);
+
+
+    // Reduz o nï¿½mero de componentes ao necessï¿½rio.
     if (n != n_mantidos)
         *componentes = realloc (*componentes, sizeof (ComponenteConexo) * n_mantidos);
 
