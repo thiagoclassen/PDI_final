@@ -11,6 +11,8 @@
 #include "base.h"
 #include "filtros2d.h"
 #include "segmenta.h"
+#include "desenho.h"
+#include "cores.h"
 
 /*============================================================================*/
 /* CLASSIFICA��O DE PIXELS                                                    */
@@ -190,6 +192,8 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
                 c->label = label;
                 c->roi = criaRetangulo (row, row, col, col);
                 c->n_pixels = 0;
+
+                desenhaRetangulo(c->roi, criaCor(0,1,0), img);
 
 				pilha [0] = criaCoordenada (col,row);
 				floodFill (img, pilha, c);

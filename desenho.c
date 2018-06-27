@@ -1,9 +1,9 @@
 /*============================================================================*/
-/* FUNÇÕES PARA DESENHAR COISAS                                               */
+/* FUNï¿½ï¿½ES PARA DESENHAR COISAS                                               */
 /*----------------------------------------------------------------------------*/
 /* Autor: Bogdan T. Nassu - nassu@dainf.ct.utfpr.edu.br                       */
 /*============================================================================*/
-/** Funções para desenhar elementos em imagens. */
+/** Funï¿½ï¿½es para desenhar elementos em imagens. */
 /*============================================================================*/
 
 #include "desenho.h"
@@ -13,7 +13,7 @@
 /*============================================================================*/
 /** Desenha uma linha reta entre dois pontos.
  *
- * Parâmetros: Coordenada p1: um ponto.
+ * Parï¿½metros: Coordenada p1: um ponto.
  *             Coordenada p2: outro ponto.
  *             Cor cor: cor a se usar.
  *             Imagem* img: desenha aqui.
@@ -47,9 +47,9 @@ void desenhaLinha (Coordenada p1, Coordenada p2, Cor cor, Imagem* img)
 }
 
 /*----------------------------------------------------------------------------*/
-/** Desenha um retângulo.
+/** Desenha um retï¿½ngulo.
  *
- * Parâmetros: Retangulo r: coordenadas do retângulo a desenhar.
+ * Parï¿½metros: Retangulo r: coordenadas do retï¿½ngulo a desenhar.
  *             Cor cor: cor a se usar.
  *             Imagem* img: desenha aqui.
  *

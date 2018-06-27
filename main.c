@@ -56,6 +56,8 @@ int main()
 		Imagem *red = criaImagem(img->largura, img->altura, 3);
 		
 		Imagem *redMap = criaImagem(img->largura, img->altura, 3);
+		
+		Imagem *cannyRed = criaImagem(img->largura, img->altura, 3);
 
 		redDetector(img, red);
 
@@ -71,7 +73,18 @@ int main()
 		sprintf(fileName, "./resultados/%d-redMap.bmp", idx+1);
 		ComponenteConexo *componentes;
 		rotulaFloodFill(redMap, &componentes, LARGURA_MIN, ALTURA_MIN, N_PIXELS_MIN);
-		salvaImagem(redMap, fileName);		
+		salvaImagem(redMap, fileName);
+
+
+		detectorCanny(redMap, 3, 0.01, 0.4, 1, cannyRed);
+		sprintf(fileName, "./resultados/%d-cannyRed.bmp", idx+1);
+		salvaImagem(cannyRed, fileName);
+
+		//printf("\n comps : %d \n", comps);
+
+
+
+
 
 		/*for (i = 0; i < chamfer->altura; i++)
 		{
@@ -91,6 +104,7 @@ int main()
 		destroiImagem(img);
 		destroiImagem(red);
 		destroiImagem(redMap);
+		destroiImagem(cannyRed);
 	}
 	return (0);
 }
