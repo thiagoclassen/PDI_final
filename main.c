@@ -34,7 +34,7 @@ void redDetector(Imagem *img, Imagem *img_out);
 
 void redMapping(Imagem *in, Imagem *out);
 
-int checkPlaca(Imagem *img);
+float checkPlaca(Imagem *img);
 
 /*============================================================================*/
 
@@ -104,10 +104,11 @@ int main()
 		for(i=1;i<=qtde;i++){
 			sprintf(elementName, "./resultados/%d-element%d.bmp", idx+1,i);
 			Imagem *element = abreImagem(elementName, 3);
-			if(checkPlaca(element)){
-				printf("\n %d-element%d é praca!! \n", idx+1,i);
+			float tmp = checkPlaca(element);
+			if(tmp>90.f){
+				printf("\n %d-element%d é praca %.2f%% !! \n", idx+1,i, tmp);
 			} else {
-				printf("\n %d-element%d não é praca!! (eu acho) \n",  idx+1,i);
+				printf("\n %d-element%d não é praca %.2f%% !! (eu acho) \n",  idx+1,i, tmp);
 			}
 			//Imagem *elementCanny = criaImagem(element->largura, element->altura, 3);
 			//detectorCanny(element, 5, 0.01, 0.4, 1, elementCanny);
@@ -143,9 +144,9 @@ int main()
 	return (0);
 }
 
-int checkPlaca(Imagem *img){
+float checkPlaca(Imagem *img){
 
-	Imagem *gabarito = abreImagem("./gabarito.bmp", 3);
+	Imagem *gabarito = abreImagem("./gabs.bmp", 3);
 
 	Imagem *resize = criaImagem(gabarito->largura, gabarito->altura, 3);
 	
@@ -170,11 +171,8 @@ int checkPlaca(Imagem *img){
 
 	//printf("\n %d de %d ---> %.2f%% \n", count, total, perc);
 
-	if(perc > 90.0f){
-		return 1;
-	} else {
-		return 0;
-	}
+	
+	return perc;	
 }
 
 void chamferFunc(Imagem *canny, Imagem *chamfer)
