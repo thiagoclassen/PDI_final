@@ -1,9 +1,9 @@
 /*============================================================================*/
-/* SEGMENTAÇÃO                                                                */
+/* SEGMENTAï¿½ï¿½O                                                                */
 /*----------------------------------------------------------------------------*/
 /* Autor: Bogdan T. Nassu - nassu@dainf.ct.utfpr.edu.br                       */
 /*============================================================================*/
-/** Tipos e funções para segmentação. */
+/** Tipos e funï¿½ï¿½es para segmentaï¿½ï¿½o. */
 /*============================================================================*/
 
 #ifndef __SEGMENTA_H
@@ -30,7 +30,7 @@ void binariza (Imagem* in, Imagem* out, float threshold);
 void binarizaAdapt (Imagem* in, Imagem* out, int largura, float threshold, Imagem* buffer);
 float thresholdOtsu (Imagem* img);
 
-int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min);
+int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min, int idx);
 void floodFill (Imagem* img, Coordenada* pilha, ComponenteConexo* componente);
 int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min);
 

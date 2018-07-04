@@ -11,6 +11,8 @@
 #include "base.h"
 #include "filtros2d.h"
 #include "segmenta.h"
+#include "desenho.h"
+#include "cores.h"
 
 /*============================================================================*/
 /* CLASSIFICA��O DE PIXELS                                                    */
@@ -156,13 +158,13 @@ float thresholdOtsu (Imagem* img)
  *
  * Valor de retorno: o n�mero de componentes conexos encontrados. */
 
-int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min, int idx)
+int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_min, int altura_min, int n_pixels_min)
 {
-    int row, col, n, i, j, k;
-    char fileName[25];
+    int row, col, n, idx;
 
     // Marca todos os objetos com valores negativos.
     n = 0;
+    idx = 0;
     for (row = 0; row < img->altura; row++)
         for (col = 0; col < img->largura; col++)
             if (img->dados [0][row][col] > 0)
@@ -173,6 +175,8 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
 
     // Aloca o vetor de sa�da. Inicialmente, vamos reservar espa�o como se cada pixel fosse um componente.
     *componentes = malloc (sizeof (ComponenteConexo) * n);
+
+    float rejectArray[800] = { 0 };
 
     // Aloca a pilha (para flood fill com pilha).
     Coordenada* pilha = malloc (sizeof (Coordenada) * n);
@@ -192,36 +196,47 @@ int rotulaFloodFill (Imagem* img, ComponenteConexo** componentes, int largura_mi
                 c->roi = criaRetangulo (row, row, col, col);
                 c->n_pixels = 0;
 
-				        pilha [0] = criaCoordenada (col,row);
-			          floodFill (img, pilha, c);
+                desenhaRetangulo(c->roi, criaCor(0,1,0), img);
+
+				pilha [0] = criaCoordenada (col,row);
+				floodFill (img, pilha, c);
 
                 // Verifica se este componente n�o ficou pequeno demais.
                 if (c->n_pixels >= n_pixels_min &&
                     c->roi.d - c->roi.e + 1 >= largura_min &&
-                    c->roi.b - c->roi.c + 1 >= altura_min) {
-                    n++;
-
-                    //desenhaRetangulo(c->roi, cor, img); //Teste Para ver os objetos na imagem original
-
-                    Imagem *element = criaImagem(c->roi.d - c->roi.e, c->roi.b - c->roi.c, 1); //utiliza as bordas do retangulo para definir o tamanho da imagem que vai conter o componente
-
-                    for(i=c->roi.c;i<c->roi.b; i++) {  //Preenche a imagem em branco onde elemento esta populado
-                      for(j=c->roi.e;j<c->roi.d; j++) {
-                        if(img->dados[0][i][j] == label) {
-                          //printf("\ni: %d\nj: %d\n", i, j);
-                          element->dados[0][i-c->roi.c][j-c->roi.e] = 1.0;
-                        }
-                      }
+                    c->roi.b - c->roi.c + 1 >= altura_min){
+                        n++;
+                    }else {
+                        //printf("\n %d -- Componente %f rejeitado. \n", n,c->label);
+                        rejectArray[idx] = label;
+                        idx++;
                     }
-                    sprintf(fileName ,"./resultados/%d-element%d.bmp", idx, n);
-                    salvaImagem(element, fileName); 
-                    //Aplicar canny nessa imagem e usar o canny para comparar com o chamfer
-						//Ps - Escolher um elemento extraido bem definido para aplicar o chamfer e usar como referencia
-                }				
+
                 label += 0.1f;
             }
-
         }
+    }
+
+    for(int i = 0;rejectArray[i]!= 0;i++) {
+        for (row = 0; row < img->altura; row++)
+        {
+            for (col = 0; col < img->largura; col++)
+            {
+                // Achou um componente n�o rotulado.
+                if (img->dados [0][row][col] == rejectArray[i])
+                {                      
+                    img->dados [0][row][col] = 0;
+                    img->dados [1][row][col] = 0;
+                    img->dados [2][row][col] = 0;
+                }else if(img->dados [0][row][col] == -1)
+                {                      
+                    img->dados [0][row][col] = 0;
+                    img->dados [1][row][col] = 0;
+                    img->dados [2][row][col] = 0;
+                }
+            }
+        }
+        //printf("\n %f -- Componente rejeitado. \n", rejectArray[i]);
     }
 
     // Descarta a pilha.
@@ -359,7 +374,7 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
         {
             if (img->dados [0][i][j] < 0) // Pixel n�o marcado.
             {
-
+                
                 // Tem um vizinho j� marcado � esquerda ou acima?
                 float label_cima = (i > 0)? img->dados [0][i-1][j] : 0;
                 float label_esquerda = (j > 0)? img->dados [0][i][j-1]: 0;
@@ -436,7 +451,7 @@ int rotulaUnionFind (Imagem* img, ComponenteConexo** componentes, int largura_mi
     // Elimina componentes pequenos demais.
     int n_mantidos = 0;
 
-
+    
     printf("\n Encontrados: %d \n", n);
 
     for (i = 0; i < n; i++)

@@ -12,25 +12,35 @@
 
 /*============================================================================*/
 
-#define ALTURA_MIN 5
-#define LARGURA_MIN 5
+#define THRESHOLD 1.0
+#define ALTURA_MIN 30
+#define LARGURA_MIN 30
 #define N_PIXELS_MIN 30
 
 /*============================================================================*/
 
+typedef struct {
+	Coordenada top;
+	Coordenada bot;
+	Coordenada left;
+	Coordenada right;
+} Frame;
+
 void chamferFunc(Imagem *canny, Imagem *chamfer);
 
-void recurssChamfer(Imagem *canny, Imagem *chamfer, float value, int y, int x);
+int recurssChamfer(Imagem *canny, Imagem *chamfer, float value, int y, int x);
 
 void redDetector(Imagem *img, Imagem *img_out);
 
 void redMapping(Imagem *in, Imagem *out);
 
+int checkPlaca(Imagem *img);
+
 /*============================================================================*/
 
 int main()
 {
-	//int i, j; //, p;
+	int elem, idx=5, qtde, i, j;
 	//float r, g, b, h, s, l;
 
 	char *files[13] = {"./img/placa01.bmp", "./img/placa02.bmp", "./img/placa03.bmp", "./img/placa04.bmp",
@@ -38,53 +48,77 @@ int main()
 					   "./img/placa09.bmp", "./img/placa10.bmp", "./img/placa11.bmp"
 					   , "./img/placa12.bmp", "./img/placa13.bmp"};
 
-	char fileName[25];
+	char fileName[25], elementName[35];
 
-	for (int idx = 0; idx < 13; idx++)
-	{
+	for (int idx = 0; idx < 13; idx++) {
 
 		Imagem *img = abreImagem(files[idx], 3);
+		//Imagem *img = abreImagem("./img/placa01.bmp", 3);
 		if (!img)
 		{
 			printf("Erro abrindo a imagem.\n");
 			exit(1);
 		}
-		Imagem *canny = criaImagem(img->largura, img->altura, 3);
+		Coordenada coo;
 
-		Imagem *chamfer = criaImagem(img->largura, img->altura, 1);
+		coo.x = 2;
+		coo.y = 2;
+
+		//Imagem *kernel = criaImagem(3, 3, 1);
+
+		//Imagem *dilatada = criaImagem(img->largura, img->altura, 3);
+
+		//Imagem *canny = criaImagem(img->largura, img->altura, 3);Descomentar  quando for fazer o chamfer
+
+		//Imagem *chamfer = criaImagem(img->largura, img->altura, 1); Descomentar quando for fazer o chamfer
 
 		Imagem *red = criaImagem(img->largura, img->altura, 3);
-		
-		Imagem *redMap = criaImagem(img->largura, img->altura, 3);
-		
-		Imagem *cannyRed = criaImagem(img->largura, img->altura, 3);
+
+		Imagem *redMap = criaImagem(img->largura, img->altura, 1);
 
 		redDetector(img, red);
 
 		sprintf(fileName, "./resultados/%d-red.bmp", idx+1);
-		salvaImagem(red, fileName);		
+		salvaImagem(red, fileName);
 
-		detectorCanny(img, 3, 0.01, 0.4, 1, canny);
+
+		/*detectorCanny(img, 3, 0.01, 0.4, 1, canny);
 
 		sprintf(fileName, "./resultados/%d-canny.bmp", idx+1);
 		salvaImagem(canny, fileName);
 
+		dilata(canny, kernel, coo, dilatada);
+		salvaImagem(dilatada, "Dilatada");*/
+
+
 		redMapping(img, redMap);
-		sprintf(fileName, "./resultados/%d-redMap.bmp", idx+1);
+		sprintf(fileName, "./resultados/%d-redMap1.bmp", idx+1);
+		salvaImagem(redMap, fileName);
+		sprintf(fileName, "./resultados/%d-redMap2.bmp", idx+1);
 		ComponenteConexo *componentes;
-		rotulaFloodFill(redMap, &componentes, LARGURA_MIN, ALTURA_MIN, N_PIXELS_MIN);
+		qtde = rotulaFloodFill(redMap, &componentes, LARGURA_MIN, ALTURA_MIN, N_PIXELS_MIN, idx+1);
 		salvaImagem(redMap, fileName);
 
+		//printf("\n%d - %d elementos\n", idx+1,qtde);
 
-		detectorCanny(redMap, 3, 0.01, 0.4, 1, cannyRed);
-		sprintf(fileName, "./resultados/%d-cannyRed.bmp", idx+1);
-		salvaImagem(cannyRed, fileName);
+		for(i=1;i<=qtde;i++){
+			sprintf(elementName, "./resultados/%d-element%d.bmp", idx+1,i);
+			Imagem *element = abreImagem(elementName, 3);
+			if(checkPlaca(element)){
+				printf("\n %d-element%d é praca!! \n", idx+1,i);
+			} else {
+				printf("\n %d-element%d não é praca!! (eu acho) \n",  idx+1,i);
+			}
+			//Imagem *elementCanny = criaImagem(element->largura, element->altura, 3);
+			//detectorCanny(element, 5, 0.01, 0.4, 1, elementCanny);
+			//sprintf(fileName, "./resultados/%d-element%dcanny.bmp", idx+1,i);
+			//salvaImagem(elementCanny, fileName);
+			//dilata(canny, kernel, coo, dilatada);
+			destroiImagem(element);
+			//destroiImagem(elementCanny);
+		}
 
-		//printf("\n comps : %d \n", comps);
-
-
-
-
+		
 
 		/*for (i = 0; i < chamfer->altura; i++)
 		{
@@ -95,18 +129,52 @@ int main()
 		}
 
 		Imagem *tst = abreImagem("saida.bmp", 3);
-		chamferFunc(canny, tst);
+		chamferFunc(canny, chamfer);
 
 		salvaImagem(chamfer, "chamfer_teste.bmp");*/
 
-		destroiImagem(canny);
-		destroiImagem(chamfer);
+		//destroiImagem(canny);
+		//destroiImagem(chamfer);
 		destroiImagem(img);
 		destroiImagem(red);
 		destroiImagem(redMap);
-		destroiImagem(cannyRed);
 	}
+
 	return (0);
+}
+
+int checkPlaca(Imagem *img){
+
+	Imagem *gabarito = abreImagem("./gabarito.bmp", 3);
+
+	Imagem *resize = criaImagem(gabarito->largura, gabarito->altura, 3);
+	
+	redimensionaBilinear(img, resize);
+
+	int count = 0;
+
+	for(int j = 0; j<resize->altura; j++){
+		for(int i = 0; i < resize->largura; i++){
+			if(gabarito->dados[0][j][i] > 0 && resize->dados[0][j][i] > 0){
+				count++;
+			}
+		}
+	}
+	
+	int total = resize->altura*resize->largura;
+
+	float perc = ((float)count/total)*100.0;
+
+	destroiImagem(resize);
+	destroiImagem(gabarito);
+
+	//printf("\n %d de %d ---> %.2f%% \n", count, total, perc);
+
+	if(perc > 90.0f){
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 void chamferFunc(Imagem *canny, Imagem *chamfer)
@@ -128,69 +196,47 @@ void chamferFunc(Imagem *canny, Imagem *chamfer)
 	}
 }
 
-void recurssChamfer(Imagem *canny, Imagem *chamfer, float value, int y, int x)
+int recurssChamfer(Imagem *canny, Imagem *chamfer, float value, int y, int x)
 {
+	chamfer->dados[0][y][x] = value;
 
-	if (value < 6.0)
-	{
+	value = value + 0.01;
 
-		chamfer->dados[0][y][x] = value;
-
-		if (x > 0)
-		{
-			if (chamfer->dados[0][y][x - 1] > value)
-			{
-				if (canny->dados[0][y][x - 1] != 1)
-				{
-					value = value + 0.01;
-					//printf("\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
-					recurssChamfer(canny, chamfer, value, y, x - 1);
-				}
-			}
-		}
-
-		if (y > 0)
-		{
-			if (chamfer->dados[0][y - 1][x] > value)
-			{
-				if (canny->dados[0][y - 1][x] != 1)
-				{
-					value = value + 0.01;
-					//printf("\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
-					recurssChamfer(canny, chamfer, value, y - 1, x);
-				}
-			}
-		} 
-
-		if (x + 1 < canny->largura - 1)
-		{
-			if (chamfer->dados[0][y][x + 1] > value)
-			{
-				if (canny->dados[0][y][x + 1] != 1)
-				{
-					value = value + 0.01;
-					//printf("\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
-					recurssChamfer(canny, chamfer, value, y, x + 1);
-				}
-			}
-		}
-
-		if (y + 1 < canny->altura - 1)
-		{
-			if (chamfer->dados[0][y + 1][x] > value)
-			{
-				if (canny->dados[0][y + 1][x] != 1)
-				{
-					value = value + 0.01;
-					//printf("\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
-					recurssChamfer(canny, chamfer, value, y + 1, x);
-				}
-			}
+	if(x > 0 && value < THRESHOLD) {
+		if(chamfer->dados[0][y][x-1] > value && canny->dados[0][y][x-1] != 1) {
+			//printf("\nIF 1\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
+			//if(recurssChamfer(canny, chamfer, value, y, x-1) == 1) return 1;
+			recurssChamfer(canny, chamfer, value, y, x-1);
 		}
 	}
+
+	if(y > 0 && value < THRESHOLD) {
+		if(chamfer->dados[0][y-1][x] > value && canny->dados[0][y-1][x] != 1) {
+			//printf("\nIF 2\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
+			//if(recurssChamfer(canny, chamfer, value, y-1, x) == 1) return 1;
+			recurssChamfer(canny, chamfer, value, y-1, x);
+		}
+	}
+
+	if(x < canny->largura-1 && value < THRESHOLD) {
+		if(chamfer->dados[0][y][x+1] > value && canny->dados[0][y][x+1] != 1) {
+			//printf("\nIF 3\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
+			//if(recurssChamfer(canny, chamfer, value, y, x+1) == 1) return 1;
+			recurssChamfer(canny, chamfer, value, y, x+1);
+		}
+	}
+
+	if(y < canny->altura-1 && value < THRESHOLD) {
+		if(chamfer->dados[0][y+1][x] > value && canny->dados[0][y+1][x] != 1) {
+			//printf("\nIF 4\nAltura: %d\nLargura: %d\nValue: %f\n", y, x, value);
+			//if(recurssChamfer(canny, chamfer, value, y+1, x) == 1) return 1;
+			recurssChamfer(canny, chamfer, value, y+1, x);
+		}
+	}
+
+
+	return 1;
 }
-
-
 
 void redDetector(Imagem *img, Imagem *img_out){
 
@@ -223,14 +269,9 @@ void redDetector(Imagem *img, Imagem *img_out){
 
 void redMapping(Imagem *in, Imagem *out)
 {
-    if (in->largura != out->largura || in->altura != out->altura || in->n_canais != out->n_canais)
-    {
-        printf("ERRO: binariza: as imagens precisam ter o mesmo tamanho e numero de canais.\n");
-        exit(1);
-    }
 
     int j, k;
-	float r, g, b;
+		float r, g, b;
     for (j = 0; j < in->altura; j++){
         for (k = 0; k < in->largura; k++){
 
@@ -238,14 +279,10 @@ void redMapping(Imagem *in, Imagem *out)
 			g = in->dados[1][j][k];
 			b = in->dados[2][j][k];
 
-            if ((r - g > 0.1 && r - b > 0.1f)) {
-                out->dados[0][j][k] = 1.0f;
-				out->dados[1][j][k] = 1.0f;
-				out->dados[2][j][k] = 1.0f;
+      if ((r - g > 0.1 && r - b > 0.1)) {
+        out->dados[0][j][k] = 1.0;
 			} else {
-                out->dados[0][j][k] = 0.0f;
-				out->dados[1][j][k] = 0.0f;
-				out->dados[2][j][k] = 0.0f;
+        out->dados[0][j][k] = 0.0;
 			}
 		}
 	}
